@@ -8,6 +8,11 @@ const {
 } = require('graphql')
 
 // Hardcoded Data
+const customers = [
+  { id: '1', name: 'John Doe', email: 'jdoe@gmail.com', age: 35 },
+  { id: '2', name: 'Steve Smith', email: 'steve@gmail.com', age: 25 },
+  { id: '3', name: 'Sara Williams', email: 'sara@gmail.com', age: 28 },
+]
 
 // Customer Type
 const CustomerType = new GraphQLObjectType({
@@ -20,23 +25,26 @@ const CustomerType = new GraphQLObjectType({
   }),
 })
 
-// Customer Type
-const CustomerType = new GraphQLObjectType({
-  name: 'Customer',
-  fields: () => ({
-    id: { type: GraphQLString },
-    name: { type: GraphQLString },
-    mail: { type: GraphQLString },
-    age: { GraphQLInt },
-  }),
-})
-
 // Root Query
-const RootQuery = GraphQLObjectType({
+const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
-  customer: {
-    type: CustomerType,
+  fields: {
+    customer: {
+      type: CustomerType,
+      args: {
+        id: { type: GraphQLString },
+      },
+      resolve(parentValue, args) {
+        for (let i = 0; i < customers.length; i++) {
+          if (customers[i].id == args.id) {
+            return customers[i]
+          }
+        }
+      },
+    },
   },
 })
 
-module.exports = new GraphQLSchema({})
+module.exports = new GraphQLSchema({
+  query: RootQuery,
+})
